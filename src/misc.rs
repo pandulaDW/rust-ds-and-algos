@@ -43,6 +43,22 @@ fn _longest_common_prefix(strs: Vec<String>) -> String {
 
     return prefix;
 }
+
+fn _fizz_buzz(n: i32) -> Vec<String> {
+    return (1..n + 1)
+        .map(|val| {
+            if val % 3 == 0 && val % 5 == 0 {
+                return "FizzBuzz".to_string();
+            } else if val % 3 == 0 {
+                return "Fizz".to_string();
+            } else if val % 5 == 0 {
+                return "Buzz".to_string();
+            } else {
+                return format!("{}", val);
+            }
+        })
+        .collect();
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -90,5 +106,18 @@ mod tests {
         ];
 
         assert_eq!("fl", _longest_common_prefix(input));
+    }
+
+    #[test]
+    fn test_fizz_buzz() {
+        assert_eq!(vec!["1", "2", "Fizz"], _fizz_buzz(3));
+        assert_eq!(vec!["1", "2", "Fizz", "4", "Buzz"], _fizz_buzz(5));
+        assert_eq!(
+            vec![
+                "1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz",
+                "13", "14", "FizzBuzz"
+            ],
+            _fizz_buzz(15)
+        );
     }
 }
