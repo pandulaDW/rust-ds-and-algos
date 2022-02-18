@@ -13,22 +13,40 @@ fn _length_of_last_world(input: String) -> i32 {
     return len_word;
 }
 
-fn _reverse_string(input: String) -> String {
-    let mut chars: Vec<char> = input.chars().collect();
-    let word_len = chars.len();
+fn _reverse_string(s: &mut Vec<char>) {
+    let word_len = s.len();
 
     for i in 0..word_len / 2 {
-        let temp = chars[i];
-        chars[i] = chars[word_len - (i + 1)];
-        chars[word_len - (i + 1)] = temp;
+        let temp = s[i];
+        s[i] = s[word_len - (i + 1)];
+        s[word_len - (i + 1)] = temp;
     }
-
-    return chars.into_iter().collect();
 }
 
+fn _longest_common_prefix(strs: Vec<String>) -> String {
+    let mut prefix = String::new();
+
+    for (i, ch) in strs[0].chars().enumerate() {
+        let prefix_included = strs.iter().skip(1).all(|v| {
+            let cur = match v.chars().nth(i) {
+                Some(v) => v,
+                None => return false,
+            };
+            return cur == ch;
+        });
+        if prefix_included {
+            prefix.push(ch);
+        } else {
+            break;
+        }
+    }
+
+    return prefix;
+}
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn test_length_of_last_world() {
@@ -50,13 +68,27 @@ mod tests {
 
     #[test]
     fn test_reverse_string() {
-        let mut input = "hello".to_string(); // odd case
-        assert_eq!("olleh", _reverse_string(input));
+        let mut input = "hello".to_string().chars().collect(); // odd case
+        _reverse_string(&mut input);
+        assert_eq!(vec!['o', 'l', 'l', 'e', 'h'], input);
 
-        input = "worlds".to_string(); // even case
-        assert_eq!("sdlrow", _reverse_string(input));
+        input = "worlds".to_string().chars().collect(); // even case
+        _reverse_string(&mut input);
+        assert_eq!(vec!['s', 'd', 'l', 'r', 'o', 'w'], input);
 
-        input = "".to_string();
-        assert_eq!("", _reverse_string(input));
+        input = vec!['s'];
+        _reverse_string(&mut input);
+        assert_eq!(vec!['s'], input);
+    }
+
+    #[test]
+    fn test_longest_common_prefix() {
+        let input = vec![
+            "flow".to_string(),
+            "flower".to_string(),
+            "flight".to_string(),
+        ];
+
+        assert_eq!("fl", _longest_common_prefix(input));
     }
 }
