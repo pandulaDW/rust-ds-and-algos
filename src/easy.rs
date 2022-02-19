@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 fn _length_of_last_world(input: String) -> i32 {
     let mut len_word = 0;
     for ch in input.chars().rev() {
@@ -59,6 +61,27 @@ fn _fizz_buzz(n: i32) -> Vec<String> {
         })
         .collect();
 }
+
+fn _excel_sheet_column_number(column_title: String) -> i32 {
+    let mut map = HashMap::new();
+
+    (65..(65 + 26))
+        .map(|v| char::from_u32(v).unwrap())
+        .enumerate()
+        .for_each(|(i, v)| {
+            map.insert(v, (i + 1) as i32);
+        });
+
+    let mut sum = 0;
+
+    for (i, ch) in column_title.chars().into_iter().enumerate() {
+        let index = map.get(&ch).unwrap();
+        sum += 26_i32.pow((column_title.len() - (i + 1)) as u32) * index;
+    }
+
+    return sum;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -119,5 +142,13 @@ mod tests {
             ],
             _fizz_buzz(15)
         );
+    }
+
+    #[test]
+    fn test_excel_sheet_column_number() {
+        assert_eq!(2, _excel_sheet_column_number("B".to_string()));
+        assert_eq!(27, _excel_sheet_column_number("AA".to_string()));
+        assert_eq!(28, _excel_sheet_column_number("AB".to_string()));
+        assert_eq!(703, _excel_sheet_column_number("AAA".to_string()));
     }
 }
