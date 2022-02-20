@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 fn _length_of_last_world(input: String) -> i32 {
     let mut len_word = 0;
     for ch in input.chars().rev() {
@@ -92,6 +94,57 @@ fn _is_palindrome(s: String) -> bool {
     return true;
 }
 
+pub fn _valid_palindrome(s: String) -> bool {
+    let is_palindrome = |chars: &[u8]| -> bool {
+        for i in 0..(chars.len() / 2) {
+            if chars[i] != chars[chars.len() - (i + 1)] {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    let input = s.as_bytes();
+    let mut i = 0;
+    let mut end = input.len() - 1;
+
+    while i < end {
+        if input[i] != input[end] {
+            let s1 = &input[(i + 1)..(end + 1)];
+            let s2 = &input[i..end];
+            if is_palindrome(s1) || is_palindrome(s2) {
+                return true;
+            }
+            return false;
+        }
+        i += 1;
+        end -= 1;
+    }
+
+    return is_palindrome(&input);
+}
+// [2,7,11,15]
+fn _two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
+    let mut solution = Vec::<i32>::with_capacity(2);
+    let mut compliments: HashMap<i32, i32> = HashMap::new();
+
+    nums.iter().enumerate().for_each(|(i, v)| {
+        compliments.insert(*v, i as i32);
+    });
+
+    for (i, v) in nums.into_iter().enumerate() {
+        let compliment = target - v;
+        if let Some(val) = compliments.get(&compliment) {
+            if *val != i as i32 {
+                solution.push(i as i32);
+                solution.push(*val);
+                break;
+            }
+        }
+    }
+
+    return solution;
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -171,5 +224,21 @@ mod tests {
             _is_palindrome("A man, a plan, a canal: Panama".to_string())
         );
         assert_eq!(true, _is_palindrome("".to_string()));
+    }
+
+    #[test]
+    fn test_valid_palindrome() {
+        assert_eq!(true, _valid_palindrome("aba".to_string()));
+        assert_eq!(true, _valid_palindrome("abca".to_string()));
+        assert_eq!(false, _valid_palindrome("abc".to_string()));
+        assert_eq!(true, _valid_palindrome("deeee".to_string()));
+        assert_eq!(false, _valid_palindrome("cxcaac".to_string()));
+    }
+
+    #[test]
+    fn test_two_sum() {
+        assert_eq!(vec![0, 1], _two_sum(vec![2, 7, 11, 15], 9));
+        assert_eq!(vec![1, 2], _two_sum(vec![3, 2, 4], 6));
+        assert_eq!(vec![0, 1], _two_sum(vec![3, 3], 6));
     }
 }
