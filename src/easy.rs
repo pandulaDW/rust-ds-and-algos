@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 fn _length_of_last_world(input: String) -> i32 {
     let mut len_word = 0;
     for ch in input.chars().rev() {
@@ -63,23 +61,35 @@ fn _fizz_buzz(n: i32) -> Vec<String> {
 }
 
 fn _excel_sheet_column_number(column_title: String) -> i32 {
-    let mut map = HashMap::new();
-
-    (65..(65 + 26))
-        .map(|v| char::from_u32(v).unwrap())
-        .enumerate()
-        .for_each(|(i, v)| {
-            map.insert(v, (i + 1) as i32);
-        });
-
     let mut sum = 0;
 
     for (i, ch) in column_title.chars().into_iter().enumerate() {
-        let index = map.get(&ch).unwrap();
+        let index = (ch.to_digit(36).unwrap() - 9) as i32;
         sum += 26_i32.pow((column_title.len() - (i + 1)) as u32) * index;
     }
 
     return sum;
+}
+
+fn _is_palindrome(s: String) -> bool {
+    let filtered = s
+        .chars()
+        .into_iter()
+        .filter_map(|ch| {
+            if ch.is_alphanumeric() {
+                return Some(ch.to_ascii_lowercase());
+            }
+            return None;
+        })
+        .collect::<Vec<char>>();
+
+    for i in 0..(filtered.len() / 2) {
+        if filtered[i] != filtered[filtered.len() - (i + 1)] {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 #[cfg(test)]
@@ -150,5 +160,16 @@ mod tests {
         assert_eq!(27, _excel_sheet_column_number("AA".to_string()));
         assert_eq!(28, _excel_sheet_column_number("AB".to_string()));
         assert_eq!(703, _excel_sheet_column_number("AAA".to_string()));
+    }
+
+    #[test]
+    fn test_is_palindrome() {
+        assert_eq!(false, _is_palindrome("race a car".to_string()));
+        assert_eq!(true, _is_palindrome("race e car".to_string()));
+        assert_eq!(
+            true,
+            _is_palindrome("A man, a plan, a canal: Panama".to_string())
+        );
+        assert_eq!(true, _is_palindrome("".to_string()));
     }
 }
