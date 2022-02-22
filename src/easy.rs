@@ -94,7 +94,7 @@ fn _is_palindrome(s: String) -> bool {
     return true;
 }
 
-pub fn _valid_palindrome(s: String) -> bool {
+fn _valid_palindrome(s: String) -> bool {
     let is_palindrome = |chars: &[u8]| -> bool {
         for i in 0..(chars.len() / 2) {
             if chars[i] != chars[chars.len() - (i + 1)] {
@@ -123,7 +123,7 @@ pub fn _valid_palindrome(s: String) -> bool {
 
     return is_palindrome(&input);
 }
-// [2,7,11,15]
+
 fn _two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
     let mut solution = Vec::<i32>::with_capacity(2);
     let mut compliments: HashMap<i32, i32> = HashMap::new();
@@ -144,6 +144,25 @@ fn _two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
     }
 
     return solution;
+}
+
+fn _remove_adjacent_duplicates(s: String) -> String {
+    let word = s.as_bytes();
+    let mut stack = Vec::new();
+
+    for ch in word {
+        if stack.is_empty() {
+            stack.push(*ch);
+            continue;
+        }
+        if *ch == stack[stack.len() - 1] {
+            stack.pop();
+        } else {
+            stack.push(*ch);
+        }
+    }
+
+    return String::from_utf8(stack).unwrap();
 }
 #[cfg(test)]
 mod tests {
@@ -240,5 +259,16 @@ mod tests {
         assert_eq!(vec![0, 1], _two_sum(vec![2, 7, 11, 15], 9));
         assert_eq!(vec![1, 2], _two_sum(vec![3, 2, 4], 6));
         assert_eq!(vec![0, 1], _two_sum(vec![3, 3], 6));
+    }
+
+    #[test]
+    fn test_remove_adjacent_duplicates() {
+        assert_eq!("b", _remove_adjacent_duplicates("aab".to_string()));
+        assert_eq!("abd", _remove_adjacent_duplicates("aaabccddd".to_string()));
+        assert_eq!("", _remove_adjacent_duplicates("aa".to_string()));
+        assert_eq!("", _remove_adjacent_duplicates("baab".to_string()));
+        assert_eq!("m", _remove_adjacent_duplicates("mississippi".to_string()));
+        assert_eq!("ay", _remove_adjacent_duplicates("azxxzy".to_string()));
+        assert_eq!("ca", _remove_adjacent_duplicates("abbaca".to_string()));
     }
 }

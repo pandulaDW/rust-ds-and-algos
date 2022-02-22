@@ -7,6 +7,8 @@
 - Longest common prefix - O(n)
 - Fizz Buzz - O(n)
 - Excel column sheet number - O(n)
+- Sub-array to equal a sum - O(n)
+- Remove adjacent duplicates - O(n)
 
 ### Medium problems
 - Remove consecutive k-digits from a number and find the minimum remainder - O(n)
