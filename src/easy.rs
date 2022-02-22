@@ -155,7 +155,7 @@ fn _remove_adjacent_duplicates(s: String) -> String {
             stack.push(*ch);
             continue;
         }
-        if *ch == stack[stack.len() - 1] {
+        if *ch == *stack.last().unwrap() {
             stack.pop();
         } else {
             stack.push(*ch);
