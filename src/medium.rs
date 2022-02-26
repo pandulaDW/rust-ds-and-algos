@@ -75,9 +75,9 @@ fn _remove_sub_folders(folder: Vec<String>) -> Vec<String> {
         return paths;
     };
 
-    let mut path_map: HashMap<String, u8> = HashMap::new();
+    let mut path_map: HashMap<String, ()> = HashMap::new();
     folder.iter().for_each(|path| {
-        path_map.insert(path.clone(), 1);
+        path_map.insert(path.clone(), ());
     });
 
     folder
@@ -94,10 +94,18 @@ fn _remove_sub_folders(folder: Vec<String>) -> Vec<String> {
         .collect::<Vec<String>>()
 }
 
+fn _eval_rpn(tokens: Vec<String>) -> i32 {
+    5
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use pretty_assertions::assert_eq;
+
+    fn convert_to_string(input: Vec<&str>) -> Vec<String> {
+        input.into_iter().map(|v| v.to_string()).collect()
+    }
 
     #[test]
     fn test_remove_consecutive_kdigits() {
@@ -129,18 +137,30 @@ mod tests {
 
     #[test]
     fn test_remove_sub_folders() {
-        let input = vec![
-            "/a/b/c".to_string(),
-            "/a/b/ca".to_string(),
-            "/a/b/d".to_string(),
-        ];
+        let input = convert_to_string(vec!["/a/b/c", "/a/b/ca", "/a/b/d"]);
         assert_eq!(
-            vec![
-                "/a/b/c".to_string(),
-                "/a/b/ca".to_string(),
-                "/a/b/d".to_string(),
-            ],
+            convert_to_string(vec!["/a/b/c", "/a/b/ca", "/a/b/d",]),
             _remove_sub_folders(input)
+        );
+    }
+
+    #[test]
+    fn test_eval_rpn() {
+        assert_eq!(
+            9,
+            _eval_rpn(convert_to_string(vec!["2", "1", "+", "3", "*"]))
+        );
+
+        assert_eq!(
+            6,
+            _eval_rpn(convert_to_string(vec!["4", "13", "5", "/", "+"]))
+        );
+
+        assert_eq!(
+            6,
+            _eval_rpn(convert_to_string(vec![
+                "10", "6", "9", "3", "+", "-11", "*", "/", "*", "17", "+", "5", "+"
+            ]))
         );
     }
 }
