@@ -95,7 +95,29 @@ fn _remove_sub_folders(folder: Vec<String>) -> Vec<String> {
 }
 
 fn _eval_rpn(tokens: Vec<String>) -> i32 {
-    5
+    let get_op = |token: &str| -> Box<dyn Fn(i32, i32) -> i32> {
+        return match token {
+            "+" => Box::new(|v1: i32, v2: i32| v1 + v2),
+            "-" => Box::new(|v1: i32, v2: i32| v1 - v2),
+            "*" => Box::new(|v1: i32, v2: i32| v1 * v2),
+            _ => Box::new(|v1: i32, v2: i32| v1 / v2),
+        };
+    };
+
+    let mut stack = Vec::new();
+
+    for token in tokens.iter() {
+        if let Ok(v) = token.parse::<i32>() {
+            stack.push(v);
+        } else {
+            let op = get_op(token);
+            let operand1 = stack.pop().unwrap();
+            let operand2 = stack.pop().unwrap();
+            stack.push(op(operand2, operand1));
+        }
+    }
+
+    return stack.pop().unwrap();
 }
 
 #[cfg(test)]
@@ -157,7 +179,7 @@ mod tests {
         );
 
         assert_eq!(
-            6,
+            22,
             _eval_rpn(convert_to_string(vec![
                 "10", "6", "9", "3", "+", "-11", "*", "/", "*", "17", "+", "5", "+"
             ]))

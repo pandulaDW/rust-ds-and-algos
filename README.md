@@ -14,6 +14,7 @@
 - Remove consecutive k-digits from a number and find the minimum remainder - O(n)
 - Remove sub folders from a list of paths - O(n2)
 - Remove adjacent duplicates ii - O(n)
+- Evaluate reverse polish notation - O(n)
 
 ### Implemented data structures
 - A generic stack using a vector as the underlying data structure
