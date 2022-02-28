@@ -1,10 +1,7 @@
-mod binary_tree;
-mod easy;
-mod linked_list;
-mod medium;
-mod stack;
-mod vec;
+mod data_structures;
+mod problems;
 
+use data_structures::linked_list;
 fn main() {
     use linked_list::List;
 
