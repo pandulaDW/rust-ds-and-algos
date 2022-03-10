@@ -146,6 +146,47 @@ fn _two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
     return solution;
 }
 
+fn _add_binary(a: String, b: String) -> String {
+    let add_two_binary_digits = |d1: u8, d2: u8, carry: u8| {
+        let sum = (d1 - 48) + (d2 - 48) + carry;
+        match sum {
+            0 => (0, 0),
+            1 => (1, 0),
+            2 => (0, 1),
+            _ => (1, 1),
+        }
+    };
+
+    let nums_1 = a.as_bytes();
+    let nums_2 = b.as_bytes();
+    let mut solution: Vec<u8> = Vec::with_capacity(nums_1.len().max(nums_2.len()) + 1);
+    let mut i: i32 = 0;
+    let mut carry = 0;
+
+    while nums_1.len() > i as usize || nums_2.len() > i as usize {
+        let result = add_two_binary_digits(
+            *nums_1
+                .get(((nums_1.len() as i32) - (i + 1)) as usize)
+                .unwrap_or(&48),
+            *nums_2
+                .get(((nums_2.len() as i32) - (i + 1)) as usize)
+                .unwrap_or(&48),
+            carry,
+        );
+        solution.push(result.0 + 48);
+        carry = result.1;
+        i += 1;
+    }
+
+    if carry == 1 {
+        solution.push(49);
+    }
+
+    solution.reverse();
+
+    String::from_utf8(solution).unwrap()
+}
+
 fn _remove_adjacent_duplicates(s: String) -> String {
     let word = s.as_bytes();
     let mut stack = Vec::new();
@@ -270,5 +311,13 @@ mod tests {
         assert_eq!("m", _remove_adjacent_duplicates("mississippi".to_string()));
         assert_eq!("ay", _remove_adjacent_duplicates("azxxzy".to_string()));
         assert_eq!("ca", _remove_adjacent_duplicates("abbaca".to_string()));
+    }
+
+    #[test]
+    fn test_add_binary() {
+        let a = "11".to_string();
+        let b = "1".to_string();
+        assert_eq!("100", _add_binary(a, b));
+        assert_eq!("10101", _add_binary("1010".to_string(), "1011".to_string()));
     }
 }
