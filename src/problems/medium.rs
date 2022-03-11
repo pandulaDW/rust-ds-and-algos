@@ -119,11 +119,30 @@ fn _eval_rpn(tokens: Vec<String>) -> i32 {
 
     return stack.pop().unwrap();
 }
+// 5, 7, 7, 8, 8, 10
+fn _search_range(nums: Vec<i32>, target: i32) -> Vec<i32> {
+    let mut result = vec![-1, -1];
+    let mut found_first_element = false;
 
+    for (i, v) in nums.iter().enumerate() {
+        if *v == target && !found_first_element {
+            result[0] = i as i32;
+            found_first_element = true;
+        } else if *v == target && found_first_element {
+            result[1] = i as i32;
+        }
+    }
+
+    if result[0] != -1 && result[1] == -1 {
+        result[1] = result[0];
+    }
+
+    result
+}
 #[cfg(test)]
 mod tests {
     use super::*;
-    use pretty_assertions::assert_eq;
+    // use pretty_assertions::assert_eq;
 
     fn convert_to_string(input: Vec<&str>) -> Vec<String> {
         input.into_iter().map(|v| v.to_string()).collect()
@@ -184,5 +203,13 @@ mod tests {
                 "10", "6", "9", "3", "+", "-11", "*", "/", "*", "17", "+", "5", "+"
             ]))
         );
+    }
+
+    #[test]
+    fn test_search_range() {
+        assert_eq!(vec![3, 4], _search_range(vec![5, 7, 7, 8, 8, 10], 8));
+        assert_eq!(vec![-1, -1], _search_range(vec![5, 7, 7, 8, 8, 10], 6));
+        assert_eq!(vec![-1, -1], _search_range(vec![], 0));
+        assert_eq!(vec![0, 0], _search_range(vec![1], 1));
     }
 }

@@ -13,7 +13,7 @@ fn _bubble_sort<T: Ord>(s: &mut Vec<T>) {
     }
 }
 
-pub fn _selection_sort<T: Ord>(s: &mut Vec<T>) {
+fn _selection_sort<T: Ord>(s: &mut Vec<T>) {
     let mut counter = 0;
 
     while counter < s.len() {
