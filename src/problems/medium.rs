@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashSet, path::Path};
 
 fn _remove_consecutive_kdigits(num: String, k: i32) -> String {
     let s: Vec<char> = num.chars().collect();
@@ -64,33 +64,20 @@ fn _remove_adjacent_duplicates(s: String, k: i32) -> String {
 }
 
 fn _remove_sub_folders(folder: Vec<String>) -> Vec<String> {
-    let create_paths = |input: &str| {
-        let folder_names: Vec<&str> = input.split("/").skip(1).collect();
-        let mut paths = Vec::with_capacity(folder_names.len());
-
-        for i in 0..folder_names.len() - 1 {
-            paths.push(format!("/{}", &folder_names[0..i + 1].join("/")));
-        }
-
-        return paths;
-    };
-
-    let mut path_map: HashMap<String, ()> = HashMap::new();
-    folder.iter().for_each(|path| {
-        path_map.insert(path.clone(), ());
-    });
+    let path_map: HashSet<&str> = folder.iter().map(String::as_str).collect();
 
     folder
-        .into_iter()
+        .iter()
         .filter(|v| {
-            let all_folder_paths = create_paths(v);
-            for path in all_folder_paths {
-                if path_map.contains_key(&path) {
+            for path in Path::new(v).ancestors().skip(1) {
+                let path_str = path.to_str().unwrap();
+                if path_map.contains(path_str) {
                     return false;
                 }
             }
             return true;
         })
+        .map(String::to_owned)
         .collect::<Vec<String>>()
 }
 
@@ -119,7 +106,7 @@ fn _eval_rpn(tokens: Vec<String>) -> i32 {
 
     return stack.pop().unwrap();
 }
-// 5, 7, 7, 8, 8, 10
+
 fn _search_range(nums: Vec<i32>, target: i32) -> Vec<i32> {
     let mut result = vec![-1, -1];
     let mut found_first_element = false;
@@ -138,6 +125,41 @@ fn _search_range(nums: Vec<i32>, target: i32) -> Vec<i32> {
     }
 
     result
+}
+
+fn _score_of_parentheses(s: String) -> i32 {
+    #[derive(PartialEq)]
+    enum BraceType {
+        Outside,
+        Inside,
+    }
+    let braces = s.as_bytes();
+    let mut inner_sum = 0;
+    let mut solution = 0;
+    let mut stack = Vec::new();
+
+    for i in 0..braces.len() {
+        if braces[i] == b'(' && braces[i + 1] == b'(' {
+            stack.push(BraceType::Outside);
+        } else if braces[i] == b'(' && braces[i + 1] == b')' {
+            stack.push(BraceType::Inside);
+        } else {
+            let popped = stack.pop().unwrap();
+            match popped {
+                BraceType::Outside => inner_sum *= 2,
+                BraceType::Inside => inner_sum += 1,
+            }
+            match braces.get(i + 1) {
+                Some(b'(') | None if popped == BraceType::Outside => {
+                    solution += inner_sum;
+                    inner_sum = 0;
+                }
+                _ => {}
+            }
+        }
+    }
+
+    solution + inner_sum
 }
 #[cfg(test)]
 mod tests {
@@ -211,5 +233,12 @@ mod tests {
         assert_eq!(vec![-1, -1], _search_range(vec![5, 7, 7, 8, 8, 10], 6));
         assert_eq!(vec![-1, -1], _search_range(vec![], 0));
         assert_eq!(vec![0, 0], _search_range(vec![1], 1));
+    }
+
+    #[test]
+    fn test_score_of_parentheses() {
+        assert_eq!(_score_of_parentheses("()".to_string()), 1);
+        assert_eq!(_score_of_parentheses("()()".to_string()), 2);
+        assert_eq!(_score_of_parentheses("(())".to_string()), 2);
     }
 }

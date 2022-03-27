@@ -126,11 +126,7 @@ fn _valid_palindrome(s: String) -> bool {
 
 fn _two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
     let mut solution = Vec::<i32>::with_capacity(2);
-    let mut compliments: HashMap<i32, i32> = HashMap::new();
-
-    nums.iter().enumerate().for_each(|(i, v)| {
-        compliments.insert(*v, i as i32);
-    });
+    let compliments: HashMap<i32, i32> = nums.iter().zip(0..).map(|(v, i)| (*v, i)).collect();
 
     for (i, v) in nums.into_iter().enumerate() {
         let compliment = target - v;
