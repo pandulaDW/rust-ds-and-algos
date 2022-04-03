@@ -204,7 +204,7 @@ fn _reverse(x: i32) -> i32 {
 
 fn _convert_zigzag(s: String, num_rows: i32) -> String {
     let mut iter = s.as_bytes().iter().peekable();
-    let mut col_vec: Vec<Vec<&u8>> = Vec::new();
+    let mut col_vec: Vec<Vec<u8>> = Vec::new();
 
     let mut zig_index = num_rows - 2;
     let mut is_full_column = true;
@@ -222,15 +222,15 @@ fn _convert_zigzag(s: String, num_rows: i32) -> String {
             }
 
             if is_full_column {
-                column.push(iter.next().unwrap());
+                column.push(iter.next().unwrap().clone());
                 continue;
             }
 
             if i == zig_index {
-                column.push(iter.next().unwrap());
+                column.push(iter.next().unwrap().clone());
                 zig_index -= 1;
             } else {
-                column.push(&b'?');
+                column.push(b'?');
             }
         }
 
@@ -247,8 +247,8 @@ fn _convert_zigzag(s: String, num_rows: i32) -> String {
         for column in col_vec.iter() {
             match column.get(i as usize) {
                 Some(v) => {
-                    if *v != &b'?' {
-                        result.push(**v);
+                    if *v != b'?' {
+                        result.push(*v);
                     }
                 }
                 None => {}
