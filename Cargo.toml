@@ -9,7 +9,8 @@ edition = "2021"
 num_cpus = "1.13.1"
 rand = "0.8"
 regex= "1"
-async-std = "1.11.0"
+async-std = "1.7"
+surf = "1.0"
 
 [dev-dependencies]
 pretty_assertions = "1.1.0"

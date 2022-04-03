@@ -1,4 +1,7 @@
-use std::{collections::HashSet, path::Path};
+use std::{
+    collections::{HashMap, HashSet},
+    path::Path,
+};
 
 fn _remove_consecutive_kdigits(num: String, k: i32) -> String {
     let s: Vec<char> = num.chars().collect();
@@ -60,7 +63,7 @@ fn _remove_adjacent_duplicates(s: String, k: i32) -> String {
         }
     }
 
-    return String::from_utf8(stack.into_iter().map(|v| v.0).collect()).unwrap();
+    unsafe { String::from_utf8_unchecked(stack.into_iter().map(|v| v.0).collect()) }
 }
 
 fn _remove_sub_folders(folder: Vec<String>) -> Vec<String> {
@@ -161,6 +164,101 @@ fn _score_of_parentheses(s: String) -> i32 {
 
     solution + inner_sum
 }
+
+fn _length_of_longest_substring(s: String) -> i32 {
+    let mut map = HashMap::new();
+    let slice = s.as_bytes();
+    let mut max_length = 0;
+
+    let mut i = 0;
+    let mut j = 0;
+
+    for v in slice.iter() {
+        match map.insert(v, j) {
+            Some(previous) => {
+                max_length = max_length.max(j - i);
+                if previous < i {
+                    continue;
+                } else {
+                    i = previous + 1;
+                }
+            }
+            None => {}
+        }
+        j += 1;
+    }
+
+    max_length.max(j - i)
+}
+
+fn _reverse(x: i32) -> i32 {
+    x.abs()
+        .to_string()
+        .chars()
+        .rev()
+        .collect::<String>()
+        .parse::<i32>()
+        .unwrap_or(0)
+        * x.signum()
+}
+
+fn _convert_zigzag(s: String, num_rows: i32) -> String {
+    let mut iter = s.as_bytes().iter().peekable();
+    let mut col_vec: Vec<Vec<&u8>> = Vec::new();
+
+    let mut zig_index = num_rows - 2;
+    let mut is_full_column = true;
+
+    while iter.peek().is_some() {
+        let mut column = Vec::with_capacity(num_rows as usize);
+        if zig_index <= 0 {
+            is_full_column = true;
+            zig_index = num_rows - 2;
+        }
+
+        for i in 0..num_rows {
+            if iter.peek().is_none() {
+                break;
+            }
+
+            if is_full_column {
+                column.push(iter.next().unwrap());
+                continue;
+            }
+
+            if i == zig_index {
+                column.push(iter.next().unwrap());
+                zig_index -= 1;
+            } else {
+                column.push(&b'?');
+            }
+        }
+
+        is_full_column = match is_full_column {
+            true => false,
+            false => false,
+        };
+
+        col_vec.push(column);
+    }
+
+    let mut result: Vec<u8> = Vec::with_capacity(s.len());
+    for i in 0..num_rows {
+        for column in col_vec.iter() {
+            match column.get(i as usize) {
+                Some(v) => {
+                    if *v != &b'?' {
+                        result.push(**v);
+                    }
+                }
+                None => {}
+            }
+        }
+    }
+
+    unsafe { String::from_utf8_unchecked(result) }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -240,5 +338,36 @@ mod tests {
         assert_eq!(_score_of_parentheses("()".to_string()), 1);
         assert_eq!(_score_of_parentheses("()()".to_string()), 2);
         assert_eq!(_score_of_parentheses("(())".to_string()), 2);
+    }
+
+    #[test]
+    fn test_length_of_longest_substring() {
+        assert_eq!(_length_of_longest_substring("abcabcbb".to_string()), 3);
+        assert_eq!(_length_of_longest_substring("bbbbb".to_string()), 1);
+        assert_eq!(_length_of_longest_substring("pwwkew".to_string()), 3);
+        assert_eq!(_length_of_longest_substring("".to_string()), 0);
+        assert_eq!(_length_of_longest_substring("jbpnbwwd".to_string()), 4);
+        assert_eq!(_length_of_longest_substring("ohvhjdml".to_string()), 6);
+        assert_eq!(_length_of_longest_substring("abba".to_string()), 2);
+    }
+
+    #[test]
+    fn test_reverse() {
+        assert_eq!(_reverse(123), 321);
+        assert_eq!(_reverse(-123), -321);
+    }
+
+    #[test]
+    fn test_convert_zigzag() {
+        assert_eq!(
+            _convert_zigzag("PAYPALISHIRING".to_string(), 3),
+            "PAHNAPLSIIGYIR"
+        );
+        assert_eq!(
+            _convert_zigzag("PAYPALISHIRING".to_string(), 4),
+            "PINALSIGYAHRPI"
+        );
+        assert_eq!(_convert_zigzag("A".to_string(), 1), "A");
+        assert_eq!(_convert_zigzag("AB".to_string(), 1), "AB");
     }
 }

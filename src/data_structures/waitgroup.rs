@@ -1,43 +1,39 @@
 #![allow(dead_code)]
 
-use std::sync::{
-    atomic::{AtomicI32, Ordering},
-    Arc, Condvar, Mutex,
-};
+use std::sync::{Arc, Condvar, Mutex};
 
 struct Wg {
-    counter: AtomicI32,
-    lock: Mutex<bool>,
+    lock: Mutex<()>,
     cond: Condvar,
 }
 
 #[derive(Clone)]
 pub struct WaitGroup(Arc<Wg>);
 
+impl Drop for WaitGroup {
+    fn drop(&mut self) {
+        self.0.cond.notify_one();
+    }
+}
+
 impl WaitGroup {
+    /// Create a new `WaitGroup` instance.
+    ///
+    /// You can use clone to creates copies of this instance that can be safely moved across threads.
     pub fn new() -> Self {
         let wg = Wg {
-            counter: AtomicI32::new(0),
-            lock: Mutex::new(false),
+            lock: Mutex::new(()),
             cond: Condvar::new(),
         };
         WaitGroup(Arc::new(wg))
     }
 
-    pub fn add(&self, val: u32) {
-        self.0.counter.fetch_add(val as i32, Ordering::SeqCst);
-    }
-
-    pub fn done(&self) {
-        self.0.counter.fetch_add(-1, Ordering::SeqCst);
-        self.0.cond.notify_one();
-    }
-
+    /// This call would block the invoked thread until all the clones are dropped
     pub fn wait(self) {
         let mut started = self.0.lock.lock().unwrap();
 
         // take ownership of the lock and and returning it back at each iteration
-        while self.0.counter.load(Ordering::SeqCst) != 0 {
+        while Arc::strong_count(&self.0) != 1 {
             started = self.0.cond.wait(started).unwrap();
         }
     }
