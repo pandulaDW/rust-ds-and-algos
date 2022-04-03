@@ -1,3 +1,6 @@
+use std::num::IntErrorKind;
+use std::ops::Index;
+use std::str::FromStr;
 use std::{
     collections::{HashMap, HashSet},
     path::Path,
@@ -246,17 +249,50 @@ fn _convert_zigzag(s: String, num_rows: i32) -> String {
     for i in 0..num_rows {
         for column in col_vec.iter() {
             match column.get(i as usize) {
-                Some(v) => {
-                    if *v != b'?' {
-                        result.push(*v);
-                    }
+                Some(v) if *v != b'?' => {
+                    result.push(*v);
                 }
-                None => {}
+                _ => {}
             }
         }
     }
 
     unsafe { String::from_utf8_unchecked(result) }
+}
+
+fn _my_atoi(s: String) -> i32 {
+    let mut trimmed = s.trim_start();
+    if trimmed.len() == 0 {
+        return 0;
+    }
+    let sign = if trimmed.index(0..1) == "-" { -1 } else { 1 };
+    if trimmed.index(0..1) == "-" || trimmed.index(0..1) == "+" {
+        trimmed = trimmed.index(1..);
+    }
+
+    let mut cutoff = trimmed.len();
+    for (i, v) in trimmed.chars().enumerate() {
+        if !v.is_numeric() {
+            if i == 0 {
+                return 0;
+            }
+            cutoff = i;
+            break;
+        }
+    }
+
+    match i32::from_str(trimmed.index(0..cutoff)) {
+        Ok(v) => sign * v,
+        Err(err) => match err.kind() {
+            IntErrorKind::Empty => 0,
+            _ => {
+                if sign == -1 {
+                    return i32::MIN;
+                }
+                return i32::MAX;
+            }
+        },
+    }
 }
 
 #[cfg(test)]
@@ -369,5 +405,15 @@ mod tests {
         );
         assert_eq!(_convert_zigzag("A".to_string(), 1), "A");
         assert_eq!(_convert_zigzag("AB".to_string(), 1), "AB");
+    }
+
+    #[test]
+    fn test_my_atoi() {
+        assert_eq!(_my_atoi("42".to_string()), 42);
+        assert_eq!(_my_atoi("   -42".to_string()), -42);
+        assert_eq!(_my_atoi("4193 with words".to_string()), 4193);
+        assert_eq!(_my_atoi("".to_string()), 0);
+        assert_eq!(_my_atoi("-".to_string()), 0);
+        assert_eq!(_my_atoi("+1".to_string()), 1);
     }
 }
