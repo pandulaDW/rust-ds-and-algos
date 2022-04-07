@@ -201,6 +201,7 @@ fn _remove_adjacent_duplicates(s: String) -> String {
 
     return String::from_utf8(stack).unwrap();
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;

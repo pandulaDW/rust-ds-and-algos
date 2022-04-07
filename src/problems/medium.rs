@@ -295,6 +295,21 @@ fn _my_atoi(s: String) -> i32 {
     }
 }
 
+fn _rotate(matrix: &mut Vec<Vec<i32>>) {
+    let n = matrix.len();
+    let cloned = matrix.clone();
+
+    for (col_idx, row_idx) in (0..n).zip((0..n).rev()) {
+        let row = &mut matrix[row_idx];
+
+        for (i, j) in (0..n).zip((0..n).rev()) {
+            let element = cloned[j][col_idx];
+            row[i] = element;
+        }
+    }
+
+    matrix.reverse();
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -415,5 +430,26 @@ mod tests {
         assert_eq!(_my_atoi("".to_string()), 0);
         assert_eq!(_my_atoi("-".to_string()), 0);
         assert_eq!(_my_atoi("+1".to_string()), 1);
+    }
+
+    #[test]
+    fn test_rotate() {
+        let mut matrix = vec![
+            vec![5, 1, 9, 11],
+            vec![2, 4, 8, 10],
+            vec![13, 3, 6, 7],
+            vec![15, 14, 12, 16],
+        ];
+        _rotate(&mut matrix);
+
+        assert_eq!(
+            matrix,
+            vec![
+                vec![15, 13, 2, 5],
+                vec![14, 3, 4, 1],
+                vec![12, 6, 8, 9],
+                vec![16, 7, 10, 11],
+            ]
+        );
     }
 }
